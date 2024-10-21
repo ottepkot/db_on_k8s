@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: devlaba-db
+  namespace: jenkins1
+spec:
+  serviceName: "devlaba-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devlaba-db
+  template:
+    metadata:
+      labels:
+        app: devlaba-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_DB
+              value: "devlaba_db"
+            - name: POSTGRES_USER
+              value: "devlaba_user"
+            - name: POSTGRES_PASSWORD
+              value: "devlaba_password"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: devlaba-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: devlaba-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: devlaba_storage_class
